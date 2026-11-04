@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Employee Scheduling Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #263238;
+        }
+
+        header {
+            background: #263b50;
+            color: white;
+            padding: 25px 40px;
+        }
+
+        header h1 {
+            margin: 0 0 7px;
+        }
+
+        header p {
+            margin: 0;
+            color: #d7e1e9;
+        }
+
+        nav {
+            background: white;
+            padding: 15px 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-bottom: 1px solid #dce2e8;
+        }
+
+        nav a {
+            color: #263b50;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 9px 13px;
+            border-radius: 5px;
+        }
+
+        nav a:hover {
+            background: #edf2f6;
+        }
+
+        main {
+            max-width: 1250px;
+            margin: 30px auto;
+            padding: 0 22px;
+        }
+
+        .welcome {
+            margin-bottom: 25px;
+        }
+
+        .welcome h2 {
+            margin-bottom: 6px;
+        }
+
+        .welcome p {
+            color: #687782;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 22px;
+            border-radius: 9px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 5px solid #287da8;
+        }
+
+        .summary-card h3 {
+            margin: 0 0 12px;
+            color: #687782;
+            font-size: 15px;
+        }
+
+        .summary-number {
+            font-size: 30px;
+            font-weight: bold;
+            color: #263b50;
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 9px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .section-heading h2 {
+            margin: 0;
+            color: #263b50;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 15px;
+            background: #287da8;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .button:hover {
+            background: #206486;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 550px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 13px;
+            border-bottom: 1px solid #e1e6eb;
+        }
+
+        th {
+            background: #edf2f6;
+            color: #263b50;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(130px, 1fr));
+            gap: 10px;
+            overflow-x: auto;
+        }
+
+        .day-card {
+            background: #f7f9fb;
+            border: 1px solid #dce2e8;
+            border-radius: 7px;
+            padding: 12px;
+            min-height: 150px;
+        }
+
+        .day-card h3 {
+            font-size: 14px;
+            margin: 0 0 5px;
+            color: #263b50;
+        }
+
+        .day-date {
+            font-size: 12px;
+            color: #687782;
+            margin-bottom: 12px;
+        }
+
+        .shift-card {
+            background: #e5f1f8;
+            border-left: 4px solid #287da8;
+            padding: 9px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .shift-card strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .empty-message {
+            color: #7a8790;
+            font-size: 13px;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #687782;
+        }
+
+        @media (max-width: 750px) {
+            header {
+                padding: 22px;
+            }
+
+            nav {
+                padding: 12px 20px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-grid {
+                grid-template-columns: repeat(7, 150px);
+            }
+
+            .section {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Employee Scheduling Dashboard</h1>
+    <p>Employee Shift Scheduling and Availability Management System</p>
+</header>
+
+<nav>
+    <a th:href="@{/}">Dashboard</a>
+    <a th:href="@{/schedule}">Weekly Calendar</a>
+    <a th:href="@{/employees}">Employees</a>
+    <a th:href="@{/shifts}">Shift Management</a>
+    <a th:href="@{/availability}">Employee Availability</a>
+</nav>
+
+<main>
+
+    <div class="welcome">
+        <h2>Welcome to Your Scheduling Dashboard</h2>
+        <p>View employees, availability preferences, and scheduled shifts in one place.</p>
+    </div>
+
+    <!-- Dashboard Summary -->
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+            <h3>Total Employees</h3>
+            <div class="summary-number" th:text="${employeeCount}">0</div>
+        </div>
+
+        <div class="summary-card">
+            <h3>Shifts This Week</h3>
+            <div class="summary-number" th:text="${shiftCount}">0</div>
+        </div>
+
+        <div class="summary-card">
+            <h3>Availability Records</h3>
+            <div class="summary-number" th:text="${availabilityCount}">0</div>
+        </div>
+
+    </div>
+
+    <!-- Weekly Calendar -->
+
+    <section class="section">
+
+        <div class="section-heading">
+            <div>
+                <h2>Weekly Schedule</h2>
+                <p>
+                    <span th:text="${#temporals.format(weekStart, 'MMM d, yyyy')}"></span>
+                    –
+                    <span th:text="${#temporals.format(weekEnd, 'MMM d, yyyy')}"></span>
+                </p>
+            </div>
+
+            <a th:href="@{/schedule}" class="button">
+                Full Calendar
+            </a>
+        </div>
+
+        <div class="calendar-grid">
+
+            <div class="day-card"
+                 th:each="day : ${weekDates}"
+                 th:with="dayShifts=${shiftsByDate.get(day)}">
+
+                <h3 th:text="${#temporals.format(day, 'EEEE')}"></h3>
+
+                <div class="day-date"
+                     th:text="${#temporals.format(day, 'MMM d')}">
+                </div>
+
+                <div th:if="${dayShifts != null and !dayShifts.isEmpty()}">
+
+                    <div class="shift-card"
+                         th:each="shift : ${dayShifts}">
+
+                        <strong th:text="${shift.employee.firstName + ' ' + shift.employee.lastName}">
+                        </strong>
+
+                        <span th:text="${#temporals.format(shift.startTime, 'hh:mm a')}"></span>
+                        –
+                        <span th:text="${#temporals.format(shift.endTime, 'hh:mm a')}"></span>
+
+                    </div>
+
+                </div>
+
+                <div class="empty-message"
+                     th:if="${dayShifts == null or dayShifts.isEmpty()}">
+                    No shifts scheduled
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Shift Management -->
+
+    <section class="section">
+
+        <div class="section-heading">
+            <h2>Shift Management</h2>
+
+            <div class="actions">
+                <a th:href="@{/shifts/new}" class="button">
+                    + Add Shift
+                </a>
+
+                <a th:href="@{/shifts}" class="button">
+                    Manage Shifts
+                </a>
+            </div>
+        </div>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+                <tr>
+                    <th>Shift ID</th>
+                    <th>Employee</th>
+                    <th>Date</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="shift : ${shifts}">
+
+                    <td th:text="${shift.shiftID}"></td>
+
+                    <td th:text="${shift.employee.firstName + ' ' + shift.employee.lastName}"></td>
+
+                    <td th:text="${#temporals.format(shift.date, 'MM/dd/yyyy')}"></td>
+
+                    <td th:text="${#temporals.format(shift.startTime, 'hh:mm a')}"></td>
+
+                    <td th:text="${#temporals.format(shift.endTime, 'hh:mm a')}"></td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(shifts)}">
+                    <td colspan="5" class="empty-message">
+                        No shifts scheduled for this week.
+                    </td>
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+    <!-- Employee Management -->
+
+    <section class="section">
+
+        <div class="section-heading">
+            <h2>Employee Management</h2>
+
+            <a th:href="@{/employees}" class="button">
+                Manage Employees
+            </a>
+        </div>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="employee : ${employees}">
+
+                    <td th:text="${employee.employeeID}"></td>
+
+                    <td th:text="${employee.firstName}"></td>
+
+                    <td th:text="${employee.lastName}"></td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(employees)}">
+                    <td colspan="3" class="empty-message">
+                        No employees have been added.
+                    </td>
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+    <!-- Employee Availability -->
+
+    <section class="section">
+
+        <div class="section-heading">
+
+            <h2>Employee Availability & Preferences</h2>
+
+            <a th:href="@{/availability}" class="button">
+                Manage Availability
+            </a>
+
+        </div>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Day Available</th>
+                    <th>Available From</th>
+                    <th>Available Until</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="availability : ${availabilities}">
+
+                    <td th:text="${availability.employee.firstName + ' ' + availability.employee.lastName}"></td>
+
+                    <td th:text="${availability.dayOfWeek}"></td>
+
+                    <td th:text="${#temporals.format(availability.startTime, 'hh:mm a')}"></td>
+
+                    <td th:text="${#temporals.format(availability.endTime, 'hh:mm a')}"></td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(availabilities)}">
+                    <td colspan="4" class="empty-message">
+                        No employee availability has been entered.
+                    </td>
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    Employee Shift Scheduling and Availability Management System
+</footer>
+
+</body>
+</html>

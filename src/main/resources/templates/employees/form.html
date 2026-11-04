@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Form</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #263238;
+        }
+
+        header {
+            background: #263b50;
+            color: white;
+            padding: 24px 40px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        main {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 35px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd3da;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: 2px solid #2878a5;
+            border-color: #2878a5;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #2878a5;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background: #1d5f83;
+        }
+
+        .cancel-button {
+            background: #687782;
+        }
+
+        .cancel-button:hover {
+            background: #4c5b65;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 650px) {
+            main {
+                margin: 20px;
+                padding: 22px;
+            }
+
+            header {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Employee Shift Scheduling</h1>
+</header>
+
+<main>
+
+    <h2 th:text="${employee.employeeID == null}
+        ? 'Add New Employee' : 'Update Employee'">
+        Employee Information
+    </h2>
+
+    <p>Enter the employee's information below.</p>
+
+    <form th:action="${employee.employeeID == null}
+            ? @{/employees}
+            : @{/employees/update/{id}(id=${employee.employeeID})}"
+          th:object="${employee}"
+          method="post">
+
+        <div class="form-group">
+            <label for="firstName">First Name</label>
+
+            <input type="text"
+                   id="firstName"
+                   th:field="*{firstName}"
+                   placeholder="Enter first name"
+                   maxlength="50"
+                   required>
+        </div>
+
+        <div class="form-group">
+            <label for="lastName">Last Name</label>
+
+            <input type="text"
+                   id="lastName"
+                   th:field="*{lastName}"
+                   placeholder="Enter last name"
+                   maxlength="50"
+                   required>
+        </div>
+
+        <div class="actions">
+
+            <button type="submit" class="button">
+                Save Employee
+            </button>
+
+            <a th:href="@{/employees}"
+               class="button cancel-button">
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+
+</main>
+
+</body>
+</html>

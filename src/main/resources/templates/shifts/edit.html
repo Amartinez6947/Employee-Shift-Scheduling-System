@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Shift</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #263238;
+        }
+
+        header {
+            background: #263b50;
+            color: white;
+            padding: 24px 40px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        .top-navigation {
+            background: white;
+            padding: 15px 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-bottom: 1px solid #dce2e8;
+        }
+
+        .top-navigation a {
+            color: #263b50;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 9px 13px;
+            border-radius: 5px;
+        }
+
+        .top-navigation a:hover {
+            background: #edf2f6;
+        }
+
+        .top-navigation .dashboard-link {
+            background: #263b50;
+            color: white;
+        }
+
+        .container {
+            max-width: 550px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            color: #263445;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px;
+            margin-top: 7px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 12px;
+            background: #263f60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #192d46;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #263f60;
+            text-decoration: none;
+        }
+
+        @media (max-width: 650px) {
+            header {
+                padding: 22px;
+            }
+
+            .top-navigation {
+                padding: 12px 20px;
+            }
+
+            .container {
+                margin: 20px 12px;
+                padding: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Employee Shift Scheduling</h1>
+</header>
+
+<nav class="top-navigation">
+    <a class="dashboard-link" th:href="@{/}">Dashboard</a>
+    <a th:href="@{/schedule}">Weekly Calendar</a>
+    <a th:href="@{/employees}">Employees</a>
+    <a th:href="@{/shifts}">Shift Management</a>
+    <a th:href="@{/availability}">Employee Availability</a>
+</nav>
+
+<div class="container">
+
+    <h1>Edit Scheduled Shift</h1>
+
+    <form th:action="@{/shifts/update/{id}(id=${shift.shiftID})}"
+          method="post">
+
+        <label for="employeeID">Employee</label>
+
+        <select id="employeeID"
+                name="employeeID"
+                required>
+
+            <option value="">Select an employee</option>
+
+            <option th:each="employee : ${employees}"
+                    th:value="${employee.employeeID}"
+                    th:text="${employee.firstName + ' ' + employee.lastName}"
+                    th:selected="${employee.employeeID == shift.employee.employeeID}">
+            </option>
+
+        </select>
+
+        <label for="date">Shift Date</label>
+
+        <input type="date"
+               id="date"
+               name="date"
+               th:value="${shift.date}"
+               required>
+
+        <label for="startTime">Start Time</label>
+
+        <input type="time"
+               id="startTime"
+               name="startTime"
+               th:value="${shift.startTime}"
+               required>
+
+        <label for="endTime">End Time</label>
+
+        <input type="time"
+               id="endTime"
+               name="endTime"
+               th:value="${shift.endTime}"
+               required>
+
+        <button type="submit">Save Changes</button>
+
+    </form>
+
+    <a class="back-link" th:href="@{/shifts}">
+        Back to Shift Management
+    </a>
+
+</div>
+
+</body>
+</html>

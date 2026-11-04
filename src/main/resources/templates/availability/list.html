@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Availability</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            color: #263238;
+        }
+
+        header {
+            background: #263b50;
+            color: white;
+            padding: 24px 40px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        .top-navigation {
+            background: white;
+            padding: 15px 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-bottom: 1px solid #dce2e8;
+        }
+
+        .top-navigation a {
+            color: #263b50;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 9px 13px;
+            border-radius: 5px;
+        }
+
+        .top-navigation a:hover {
+            background: #edf2f6;
+        }
+
+        .top-navigation .dashboard-link {
+            background: #263b50;
+            color: white;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .page-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 11px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #2878a5;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .button:hover {
+            background: #1d5f83;
+        }
+
+        .filter-form {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: end;
+            gap: 12px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #edf2f6;
+            border-radius: 8px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        select {
+            min-width: 220px;
+            padding: 11px;
+            border: 1px solid #cbd3da;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e3e8ed;
+        }
+
+        th {
+            background: #edf2f6;
+        }
+
+        .message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+
+        .success {
+            background: #e4f4e9;
+            color: #246b3b;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: #687782;
+        }
+
+        .navigation {
+            margin-top: 25px;
+        }
+
+        @media (max-width: 650px) {
+            main {
+                margin: 20px;
+                padding: 18px;
+                overflow-x: auto;
+            }
+
+            header {
+                padding: 20px;
+            }
+
+            .top-navigation {
+                padding: 12px 20px;
+            }
+
+            .page-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Employee Shift Scheduling</h1>
+</header>
+
+<nav class="top-navigation">
+    <a class="dashboard-link" th:href="@{/}">Dashboard</a>
+    <a th:href="@{/schedule}">Weekly Calendar</a>
+    <a th:href="@{/employees}">Employees</a>
+    <a th:href="@{/shifts}">Shift Management</a>
+    <a th:href="@{/availability}">Employee Availability</a>
+</nav>
+
+<main>
+
+    <div class="page-heading">
+        <div>
+            <h2>Employee Availability</h2>
+            <p>View and manage employee working availability.</p>
+        </div>
+
+        <a th:href="@{/availability/new}" class="button">
+            + Add Availability
+        </a>
+    </div>
+
+    <div th:if="${successMessage}"
+         class="message success"
+         th:text="${successMessage}">
+    </div>
+
+    <form th:action="@{/availability}"
+          method="get"
+          class="filter-form">
+
+        <div>
+            <label for="employeeID">Select Employee</label>
+
+            <select id="employeeID"
+                    name="employeeID"
+                    required>
+
+                <option value="">Choose an employee</option>
+
+                <option th:each="employee : ${employees}"
+                        th:value="${employee.employeeID}"
+                        th:text="${employee.firstName + ' ' + employee.lastName}"
+                        th:selected="${selectedEmployeeID != null and selectedEmployeeID.equals(employee.employeeID)}">
+                </option>
+
+            </select>
+        </div>
+
+        <button type="submit" class="button">
+            View Availability
+        </button>
+
+    </form>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Day</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+        <tr th:each="availability : ${availabilityList}">
+            <td th:text="${availability.dayOfWeek}"></td>
+            <td th:text="${#temporals.format(availability.startTime, 'h:mm a')}"></td>
+            <td th:text="${#temporals.format(availability.endTime, 'h:mm a')}"></td>
+        </tr>
+
+        <tr th:if="${selectedEmployeeID != null and #lists.isEmpty(availabilityList)}">
+            <td colspan="3" class="empty-message">
+                No availability has been recorded for this employee.
+            </td>
+        </tr>
+
+        <tr th:if="${selectedEmployeeID == null}">
+            <td colspan="3" class="empty-message">
+                Select an employee to view their availability.
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+
+    <div class="navigation">
+        <a th:href="@{/employees}" class="button">
+            Back to Employees
+        </a>
+    </div>
+
+</main>
+
+</body>
+</html>
